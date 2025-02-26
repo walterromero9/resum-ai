@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: ankane/pgvector:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: resumai
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - resumai-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - resumai-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=development
+    networks:
+      - resumai-network
+    command: npm run start:dev
+
+networks:
+  resumai-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  uploads_data: 
