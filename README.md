@@ -45,7 +45,7 @@ ResumAI uses a modern stack with separate frontend and backend services:
 
 2. **Start the Backend API**
    ```bash
-   cd resumai-api
+   cd backend
    npm install
    npm run dev
    ```
